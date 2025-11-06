@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
-import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
+import { KEY_IMAGE_CUSTOM_MARKER, KEY_IMAGE_HANDLING_STRATEGY, KEY_IMAGE_INCLUDE_METADATA, KEY_IMAGE_MAX_SIZE, KEY_IMAGE_QUALITY, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
@@ -9,6 +9,9 @@ import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, getColorScheme, timestamp, unixTimestampToISOString } from '../utils/utils'
+import { getImageHandler, initializeImageHandler } from './image-handler'
+import { getCurrentTimestamp } from './image-utils'
+import type { ExportFile, ExportMetadata, ImageContext, ProcessedImage } from './image-types'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
@@ -23,10 +26,51 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     const chatId = await getCurrentChatId()
     const rawConversation = await fetchConversation(chatId, true)
     const conversation = processConversation(rawConversation)
-    const html = conversationToHtml(conversation, userAvatar, metaList)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
-    downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
+    // Initialize image handler with current settings
+    const imageHandlingStrategy = ScriptStorage.get<string>(KEY_IMAGE_HANDLING_STRATEGY) || 'embed_base64'
+    initializeImageHandler(imageHandlingStrategy as any)
+
+    const { html, exportFiles, imageMetadata } = await conversationToHtml(conversation, userAvatar, metaList)
+
+    // Handle ZIP creation for Option 3
+    if (imageHandlingStrategy === 'separate_files' && exportFiles && exportFiles.length > 0) {
+        // Create ZIP with content and images
+        const { createExportZip } = await import('./zip-packager')
+
+        const metadata = imageMetadata
+        if (metadata) {
+            metadata.conversationTitle = conversation.title
+            metadata.settings = {
+                imageQuality: ScriptStorage.get<number>(KEY_IMAGE_QUALITY) || 85,
+                maxImageSize: ScriptStorage.get<number>(KEY_IMAGE_MAX_SIZE) || 2048,
+                includeImageMetadata: ScriptStorage.get<boolean>(KEY_IMAGE_INCLUDE_METADATA) || true,
+                customMarkerText: ScriptStorage.get<string>(KEY_IMAGE_CUSTOM_MARKER) || '[Image Omitted]',
+            }
+        }
+
+        const zipBlob = await createExportZip(
+            `${conversation.title}.html`,
+            html,
+            exportFiles,
+            metadata!,
+            'text/html',
+        )
+
+        const { generateZipFileName } = await import('./zip-packager')
+        const zipFileName = generateZipFileName(conversation.title, imageHandlingStrategy)
+        downloadFile(zipFileName, 'application/zip', zipBlob)
+    }
+    else {
+        // Regular single file download
+        const fileName = getFileNameWithFormat(fileNameFormat, 'html', {
+            title: conversation.title,
+            chatId,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
+        })
+        downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
+    }
 
     return true
 }
@@ -34,10 +78,15 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
 export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[]) {
     const userAvatar = await getUserAvatar()
 
+    // Initialize image handler with current settings
+    const imageHandlingStrategy = ScriptStorage.get<string>(KEY_IMAGE_HANDLING_STRATEGY) || 'embed_base64'
+    initializeImageHandler(imageHandlingStrategy as any)
+
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => processConversation(x))
-    conversations.forEach((conversation) => {
+
+    for (const conversation of conversations) {
         let fileName = getFileNameWithFormat(fileNameFormat, 'html', {
             title: conversation.title,
             chatId: conversation.id,
@@ -52,9 +101,9 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
         else {
             filenameMap.set(fileName, 1)
         }
-        const content = conversationToHtml(conversation, userAvatar, metaList)
-        zip.file(fileName, content)
-    })
+        const { html } = await conversationToHtml(conversation, userAvatar, metaList)
+        zip.file(fileName, html)
+    }
 
     const blob = await zip.generateAsync({
         type: 'blob',
@@ -68,7 +117,7 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
     return true
 }
 
-function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
+async function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
 
     const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
@@ -77,11 +126,28 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
     const LatexRegex = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm
 
-    const conversationHtml = conversationNodes.map(({ message }) => {
-        if (!message || !message.content) return null
+    // Get image handler and extract all images
+    const imageHandler = getImageHandler()
+    const images = extractImagesFromConversation(conversation)
+
+    let processedImages: ProcessedImage[] = []
+    let exportFiles: ExportFile[] = []
+    let imageMetadata: ExportMetadata | undefined
+    if (images.length > 0) {
+        const imageResult = await imageHandler.processConversationImages(images, 'html')
+        processedImages = imageResult.processedImages || []
+        exportFiles = imageResult.files || []
+        imageMetadata = imageResult.metadata
+    }
+
+    const conversationHtml = []
+    let imageIndex = 0
+
+    for (const { message } of conversationNodes) {
+        if (!message || !message.content) continue
 
         // ChatGPT is talking to tool
-        if (message.recipient !== 'all') return null
+        if (message.recipient !== 'all') continue
 
         // Skip tool's intermediate message.
         if (message.author.role === 'tool') {
@@ -95,7 +161,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
                 && message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
             )
             ) {
-                return null
+                continue
             }
         }
 
@@ -144,7 +210,10 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             postSteps = [...postSteps, input => `<p class="no-katex">${escapeHtml(input)}</p>`]
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
-        const content = transformContent(message.content, message.metadata, postProcess)
+        const messageContent = await transformContent(message.content, message.metadata, postProcess, processedImages, imageIndex)
+
+        // Update image index for next message
+        imageIndex += countImagesInMessage(message)
 
         const timestamp = message?.create_time ?? ''
         const showTimestamp = enableTimestamp && timeStampHtml && timestamp
@@ -158,19 +227,19 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             timestampHtml = `<time class="time" datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>`
         }
 
-        return `
+        conversationHtml.push(`
 <div class="conversation-item">
     <div class="author ${authorType}">
         ${avatarEl}
     </div>
     <div class="conversation-content-wrapper">
         <div class="conversation-content">
-            ${content}
+            ${messageContent}
         </div>
     </div>
     ${timestampHtml}
-</div>`
-    }).filter(Boolean).join('\n\n')
+</div>`)
+    }
 
     const date = dateStr()
     const time = new Date().toISOString()
@@ -212,8 +281,13 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         .replaceAll('{{theme}}', theme)
         .replaceAll('{{avatar}}', avatar)
         .replaceAll('{{details}}', detailsHtml)
-        .replaceAll('{{content}}', conversationHtml)
-    return html
+        .replaceAll('{{content}}', conversationHtml.join('\n\n'))
+
+    return {
+        html,
+        exportFiles,
+        imageMetadata,
+    }
 }
 
 function transformAuthor(author: ConversationNodeMessage['author']): string {
@@ -248,12 +322,108 @@ function transformFootNotes(
 }
 
 /**
+ * Legacy function removed - replaced with async version below
+ */
+
+function escapeHtml(html: string) {
+    return html
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+}
+
+/**
+ * Extract all images from conversation nodes for processing
+ */
+function extractImagesFromConversation(conversation: ConversationResult): Array<{
+    url: string
+    context: ImageContext
+}> {
+    const images: Array<{ url: string; context: ImageContext }> = []
+
+    conversation.conversationNodes.forEach((node, nodeIndex) => {
+        const message = node.message
+        if (!message || !message.content) return
+
+        let imageIndex = 0
+
+        // Process different content types that may contain images
+        if (message.content.content_type === 'execution_output' && message.metadata?.aggregate_result?.messages) {
+            message.metadata.aggregate_result.messages.forEach((msg) => {
+                if (msg.message_type === 'image' && msg.image_url) {
+                    const imageContext: ImageContext = {
+                        conversationId: conversation.id,
+                        messageId: message.id || `node-${nodeIndex}`,
+                        imageIndex: imageIndex++,
+                        mimeType: 'image/png', // Will be detected properly
+                        originalUrl: msg.image_url,
+                        contentType: 'image_url',
+                        author: message.author,
+                        timestamp: message.create_time,
+                    }
+
+                    images.push({
+                        url: msg.image_url,
+                        context: imageContext,
+                    })
+                }
+            })
+        }
+        else if (message.content.content_type === 'multimodal_text' && message.content.parts) {
+            message.content.parts.forEach((part) => {
+                if (part.content_type === 'image_asset_pointer' && part.asset_pointer) {
+                    const imageContext: ImageContext = {
+                        conversationId: conversation.id,
+                        messageId: message.id || `node-${nodeIndex}`,
+                        imageIndex: imageIndex++,
+                        mimeType: 'image/png', // Will be detected properly
+                        originalUrl: part.asset_pointer,
+                        contentType: 'multimodal_text',
+                        author: message.author,
+                        timestamp: message.create_time,
+                    }
+
+                    images.push({
+                        url: part.asset_pointer,
+                        context: imageContext,
+                    })
+                }
+            })
+        }
+    })
+
+    return images
+}
+
+/**
+ * Helper function to count images in a message
+ */
+function countImagesInMessage(message: ConversationNodeMessage): number {
+    if (!message.content) return 0
+
+    let count = 0
+
+    if (message.content.content_type === 'execution_output' && message.metadata?.aggregate_result?.messages) {
+        count += message.metadata.aggregate_result.messages.filter(msg => msg.message_type === 'image').length
+    }
+    else if (message.content.content_type === 'multimodal_text' && message.content.parts) {
+        count += message.content.parts.filter(part => part.content_type === 'image_asset_pointer').length
+    }
+
+    return count
+}
+
+/**
  * Convert the content based on the type of message
  */
-function transformContent(
+async function transformContent(
     content: ConversationNodeMessage['content'],
     metadata: ConversationNodeMessage['metadata'],
     postProcess: (input: string) => string,
+    processedImages: ProcessedImage[],
+    imageStartIndex: number,
 ) {
     switch (content.content_type) {
         case 'text':
@@ -262,10 +432,22 @@ function transformContent(
             return `Code:\n\`\`\`\n${content.text}\n\`\`\`` || ''
         case 'execution_output':
             if (metadata?.aggregate_result?.messages) {
-                return metadata.aggregate_result.messages
-                    .filter(msg => msg.message_type === 'image')
-                    .map(msg => `<img src="${msg.image_url}" height="${msg.height}" width="${msg.width}" />`)
-                    .join('\n')
+                const imageMessages = metadata.aggregate_result.messages.filter(msg => msg.message_type === 'image')
+                if (imageMessages.length > 0) {
+                    const imageContent = imageMessages.map((_, index) => {
+                        const globalIndex = imageStartIndex + index
+                        const processedImage = processedImages[globalIndex]
+
+                        if (processedImage && processedImage.content) {
+                            return `<img src="${processedImage.content}" />`
+                        }
+                        else {
+                            return `[IMAGE_${globalIndex}]`
+                        }
+                    }).join('\n\n')
+
+                    return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`${imageContent ? `\n\n${imageContent}` : ''}`)
+                }
             }
             return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
         case 'tether_quote':
@@ -282,25 +464,33 @@ function transformContent(
             return postProcess('')
         }
         case 'multimodal_text': {
-            return content.parts?.map((part) => {
+            const parts = content.parts?.map((part, partIndex) => {
                 if (typeof part === 'string') return postProcess(part)
-                if (part.content_type === 'image_asset_pointer') return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`
-                if (part.content_type === 'audio_transcription') return `<div style="font-style: italic; opacity: 0.65;">“${part.text}”</div>`
+                if (part.content_type === 'image_asset_pointer') {
+                    // Calculate the correct global image index for this specific image
+                    const imageIndexInMessage = content.parts?.slice(0, partIndex).filter(p =>
+                        typeof p === 'object' && p.content_type === 'image_asset_pointer',
+                    ).length || 0
+                    const globalImageIndex = imageStartIndex + imageIndexInMessage
+
+                    const processedImage = processedImages[globalImageIndex]
+
+                    if (processedImage && processedImage.content) {
+                        return `<img src="${processedImage.content}" />`
+                    }
+
+                    return `[IMAGE_${globalImageIndex}]`
+                }
+                if (part.content_type === 'audio_transcription') return `<div style="font-style: italic; opacity: 0.65;">"${part.text}"</div>`
                 if (part.content_type === 'audio_asset_pointer') return null
                 if (part.content_type === 'real_time_user_audio_video_asset_pointer') return null
                 return postProcess('[Unsupported multimodal content]')
-            }).join('\n') || ''
+            }) || []
+
+            // Filter out null values and join
+            return parts.filter(part => part !== null).join('\n')
         }
         default:
             return postProcess(`[Unsupported Content: ${content.content_type} ]`)
     }
-}
-
-function escapeHtml(html: string) {
-    return html
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;')
 }

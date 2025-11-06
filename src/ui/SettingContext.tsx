@@ -3,6 +3,11 @@ import { useCallback } from 'preact/hooks'
 import {
     KEY_EXPORT_ALL_LIMIT,
     KEY_FILENAME_FORMAT,
+    KEY_IMAGE_CUSTOM_MARKER,
+    KEY_IMAGE_HANDLING_STRATEGY,
+    KEY_IMAGE_INCLUDE_METADATA,
+    KEY_IMAGE_MAX_SIZE,
+    KEY_IMAGE_QUALITY,
     KEY_META_ENABLED,
     KEY_META_LIST,
     KEY_TIMESTAMP_24H,
@@ -11,10 +16,18 @@ import {
     KEY_TIMESTAMP_MARKDOWN,
 } from '../constants'
 import { useGMStorage } from '../hooks/useGMStorage'
+import type { ImageHandlingStrategy } from '../exporter/image-types'
 import type { FC } from 'preact/compat'
 
 const defaultFormat = 'ChatGPT-{title}'
 const defaultExportAllLimit = 1000
+
+// Default image handling settings
+const defaultImageHandlingStrategy = 'embed_base64' as ImageHandlingStrategy
+const defaultCustomMarkerText = '[Image Omitted]'
+const defaultImageQuality = 85
+const defaultMaxImageSize = 2048
+const defaultIncludeImageMetadata = true
 
 export interface ExportMeta {
     name: string
@@ -45,6 +58,19 @@ const SettingContext = createContext({
     setExportMetaList: (_: ExportMeta[]) => {},
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_: number) => {},
+
+    // Image handling settings
+    imageHandlingStrategy: defaultImageHandlingStrategy,
+    setImageHandlingStrategy: (_: ImageHandlingStrategy) => {},
+    imageCustomMarker: defaultCustomMarkerText,
+    setImageCustomMarker: (_: string) => {},
+    imageQuality: defaultImageQuality,
+    setImageQuality: (_: number) => {},
+    imageMaxSize: defaultMaxImageSize,
+    setImageMaxSize: (_: number) => {},
+    imageIncludeMetadata: defaultIncludeImageMetadata,
+    setImageIncludeMetadata: (_: boolean) => {},
+
     resetDefault: () => {},
 })
 
@@ -61,18 +87,52 @@ export const SettingProvider: FC = ({ children }) => {
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit)
 
+    // Image handling settings
+    const [imageHandlingStrategy, setImageHandlingStrategy] = useGMStorage(
+        KEY_IMAGE_HANDLING_STRATEGY,
+        defaultImageHandlingStrategy,
+    )
+    const [imageCustomMarker, setImageCustomMarker] = useGMStorage(
+        KEY_IMAGE_CUSTOM_MARKER,
+        defaultCustomMarkerText,
+    )
+    const [imageQuality, setImageQuality] = useGMStorage(
+        KEY_IMAGE_QUALITY,
+        defaultImageQuality,
+    )
+    const [imageMaxSize, setImageMaxSize] = useGMStorage(
+        KEY_IMAGE_MAX_SIZE,
+        defaultMaxImageSize,
+    )
+    const [imageIncludeMetadata, setImageIncludeMetadata] = useGMStorage(
+        KEY_IMAGE_INCLUDE_METADATA,
+        defaultIncludeImageMetadata,
+    )
+
     const resetDefault = useCallback(() => {
         setFormat(defaultFormat)
         setEnableTimestamp(false)
         setEnableMeta(false)
         setExportMetaList(defaultExportMetaList)
         setExportAllLimit(defaultExportAllLimit)
+
+        // Reset image handling settings
+        setImageHandlingStrategy(defaultImageHandlingStrategy)
+        setImageCustomMarker(defaultCustomMarkerText)
+        setImageQuality(defaultImageQuality)
+        setImageMaxSize(defaultMaxImageSize)
+        setImageIncludeMetadata(defaultIncludeImageMetadata)
     }, [
         setFormat,
         setEnableTimestamp,
         setEnableMeta,
         setExportMetaList,
         setExportAllLimit,
+        setImageHandlingStrategy,
+        setImageCustomMarker,
+        setImageQuality,
+        setImageMaxSize,
+        setImageIncludeMetadata,
     ])
 
     return (
@@ -97,6 +157,18 @@ export const SettingProvider: FC = ({ children }) => {
 
                 exportAllLimit,
                 setExportAllLimit,
+
+                // Image handling settings
+                imageHandlingStrategy,
+                setImageHandlingStrategy,
+                imageCustomMarker,
+                setImageCustomMarker,
+                imageQuality,
+                setImageQuality,
+                imageMaxSize,
+                setImageMaxSize,
+                imageIncludeMetadata,
+                setImageIncludeMetadata,
 
                 resetDefault,
             }}

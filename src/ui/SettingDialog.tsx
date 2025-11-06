@@ -36,6 +36,12 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
         exportAllLimit, setExportAllLimit,
+        // Image handling settings
+        imageHandlingStrategy, setImageHandlingStrategy,
+        imageCustomMarker, setImageCustomMarker,
+        imageQuality, setImageQuality,
+        imageMaxSize, setImageMaxSize,
+        imageIncludeMetadata, setImageIncludeMetadata,
         /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
     const { t, i18n } = useTranslation()
@@ -256,6 +262,159 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                             </div>
                             <div className="absolute right-4">
                                 <Toggle label="" checked={enableMeta} onCheckedUpdate={setEnableMeta} />
+                            </div>
+                        </div>
+                        <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div>
+                                <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    {t('Image Handling')}
+                                </dt>
+                                <dd className="text-sm text-gray-700 dark:text-gray-300">
+                                    {t('Image Handling Description')}
+
+                                    {/* Image Handling Strategy Options */}
+                                    <div className="mt-4 space-y-3">
+                                        {/* Option 1: Embed Base64 */}
+                                        <div className="flex items-start">
+                                            <input
+                                                type="radio"
+                                                id="embed-base64"
+                                                name="image-handling-strategy"
+                                                value="embed_base64"
+                                                checked={imageHandlingStrategy === 'embed_base64'}
+                                                onChange={e => setImageHandlingStrategy(e.currentTarget.value as any)}
+                                                className="mt-1 mr-3"
+                                            />
+                                            <div>
+                                                <label htmlFor="embed-base64" className="font-medium text-gray-800 dark:text-white">
+                                                    {t('Embed Images')}
+                                                </label>
+                                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                                    {t('Embed Images Description')}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Option 2: Text Markers */}
+                                        <div className="flex items-start">
+                                            <input
+                                                type="radio"
+                                                id="text-marker"
+                                                name="image-handling-strategy"
+                                                value="text_marker"
+                                                checked={imageHandlingStrategy === 'text_marker'}
+                                                onChange={e => setImageHandlingStrategy(e.currentTarget.value as any)}
+                                                className="mt-1 mr-3"
+                                            />
+                                            <div>
+                                                <label htmlFor="text-marker" className="font-medium text-gray-800 dark:text-white">
+                                                    {t('Text Markers')}
+                                                </label>
+                                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                                    {t('Text Markers Description')}
+                                                </p>
+                                                {/* Custom Marker Text Control */}
+                                                {imageHandlingStrategy === 'text_marker' && (
+                                                    <div className="mt-2">
+                                                        <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                            {t('Custom Marker Text')}
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="Input mt-1 text-sm"
+                                                            value={imageCustomMarker}
+                                                            onChange={e => setImageCustomMarker(e.currentTarget.value)}
+                                                            placeholder="[Image Omitted]"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Option 3: Separate Files */}
+                                        <div className="flex items-start">
+                                            <input
+                                                type="radio"
+                                                id="separate-files"
+                                                name="image-handling-strategy"
+                                                value="separate_files"
+                                                checked={imageHandlingStrategy === 'separate_files'}
+                                                onChange={e => setImageHandlingStrategy(e.currentTarget.value as any)}
+                                                className="mt-1 mr-3"
+                                            />
+                                            <div>
+                                                <label htmlFor="separate-files" className="font-medium text-gray-800 dark:text-white">
+                                                    {t('Separate Files')}
+                                                </label>
+                                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                                    {t('Separate Files Description')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Advanced Options for Separate Files */}
+                                    {imageHandlingStrategy === 'separate_files' && (
+                                        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded">
+                                            <h4 className="text-sm font-medium text-gray-800 dark:text-white mb-3">
+                                                {t('Advanced Options')}
+                                            </h4>
+                                            {/* Image Quality */}
+                                            <div className="mb-3">
+                                                <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                    {t('Image Quality')}: {imageQuality}%
+                                                </label>
+                                                <input
+                                                    type="range"
+                                                    min="10"
+                                                    max="100"
+                                                    value={imageQuality}
+                                                    onChange={e => setImageQuality(Number(e.currentTarget.value))}
+                                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mt-1"
+                                                />
+                                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                                    {t('Image Quality Description')}
+                                                </p>
+                                            </div>
+
+                                            {/* Max Image Size */}
+                                            <div className="mb-3">
+                                                <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                    {t('Max Image Size')}: {imageMaxSize}px
+                                                </label>
+                                                <input
+                                                    type="range"
+                                                    min="512"
+                                                    max="4096"
+                                                    step="256"
+                                                    value={imageMaxSize}
+                                                    onChange={e => setImageMaxSize(Number(e.currentTarget.value))}
+                                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 mt-1"
+                                                />
+                                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                                    {t('Max Image Size Description')}
+                                                </p>
+                                            </div>
+
+                                            {/* Include Image Metadata */}
+                                            <div className="flex items-center mt-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id="include-image-metadata"
+                                                    checked={imageIncludeMetadata}
+                                                    onChange={e => setImageIncludeMetadata(e.currentTarget.checked)}
+                                                    className="mr-2"
+                                                />
+                                                <label htmlFor="include-image-metadata" className="text-xs text-gray-700 dark:text-gray-300">
+                                                    {t('Include Image Metadata')}
+                                                </label>
+                                            </div>
+                                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 ml-6">
+                                                {t('Include Image Metadata Description')}
+                                            </p>
+                                        </div>
+                                    )}
+                                </dd>
                             </div>
                         </div>
                     </dl>

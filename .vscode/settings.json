@@ -40,5 +40,8 @@
     "tabler",
     "unist"
   ],
-  "markdown.extension.toc.updateOnSave": false
+  "markdown.extension.toc.updateOnSave": false,
+  "i18n-ally.localesPaths": [
+    "src/locales"
+  ]
 }

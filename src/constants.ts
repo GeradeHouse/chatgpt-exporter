@@ -21,3 +21,10 @@ export const KEY_EXPORT_ALL_LIMIT = 'exporter:export_all_limit'
 
 export const KEY_OAI_LOCALE = 'oai/apps/locale'
 export const KEY_OAI_HISTORY_DISABLED = 'oai/apps/historyDisabled'
+
+// Image handling settings
+export const KEY_IMAGE_HANDLING_STRATEGY = 'exporter:image_handling_strategy'
+export const KEY_IMAGE_CUSTOM_MARKER = 'exporter:image_custom_marker'
+export const KEY_IMAGE_QUALITY = 'exporter:image_quality'
+export const KEY_IMAGE_MAX_SIZE = 'exporter:image_max_size'
+export const KEY_IMAGE_INCLUDE_METADATA = 'exporter:image_include_metadata'
