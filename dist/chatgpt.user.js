@@ -618,11 +618,11 @@ html {\r
     color: rgb(71 85 105);\r
 } `);
 
-System.addImportMap({ imports: {"jszip":"user:jszip","html2canvas":"user:html2canvas"} });
-System.set("user:jszip", (()=>{const _=JSZip;('default' in _)||(_.default=_);return _})());
+System.addImportMap({ imports: {"html2canvas":"user:html2canvas","jszip":"user:jszip"} });
 System.set("user:html2canvas", (()=>{const _=html2canvas;('default' in _)||(_.default=_);return _})());
+System.set("user:jszip", (()=>{const _=JSZip;('default' in _)||(_.default=_);return _})());
 
-System.register("./__entry.js", ['./__monkey.entry-Bw0ISNLo.js'], (function (exports, module) {
+System.register("./__entry.js", ['./__monkey.entry-ZrX23HSs.js'], (function (exports, module) {
 	'use strict';
 	return {
 		setters: [null],
@@ -634,7 +634,7 @@ System.register("./__entry.js", ['./__monkey.entry-Bw0ISNLo.js'], (function (exp
 	};
 }));
 
-System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (function (exports, module) {
+System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (function (exports, module) {
   'use strict';
   var JSZip, html2canvas;
   return {
@@ -915,99 +915,6 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
       function getDefaultExportFromCjs(x2) {
         return x2 && x2.__esModule && Object.prototype.hasOwnProperty.call(x2, "default") ? x2["default"] : x2;
       }
-      var sentinel_umd = { exports: {} };
-      (function(module, exports) {
-        (function(root2, factory) {
-          {
-            module.exports = factory();
-          }
-        })(commonjsGlobal, function() {
-          var isArray = Array.isArray, selectorToAnimationMap = {}, animationCallbacks = {}, styleEl, styleSheet, cssRules;
-          return {
-            /**
-             * Add watcher.
-             * @param {array} cssSelectors - List of CSS selector strings
-             * @param {Function} callback - The callback function
-             */
-            on: function(cssSelectors, callback) {
-              if (!callback) return;
-              if (!styleEl) {
-                var doc = document, head2 = doc.head;
-                doc.addEventListener("animationstart", function(ev, callbacks, l2, i2) {
-                  callbacks = animationCallbacks[ev.animationName];
-                  if (!callbacks) return;
-                  ev.stopImmediatePropagation();
-                  l2 = callbacks.length;
-                  for (i2 = 0; i2 < l2; i2++) callbacks[i2](ev.target);
-                }, true);
-                styleEl = doc.getElementById("sentinel-css");
-                if (!styleEl) {
-                  styleEl = doc.createElement("style");
-                  head2.insertBefore(styleEl, head2.firstChild);
-                }
-                styleSheet = styleEl.sheet;
-                cssRules = styleSheet.cssRules;
-              }
-              (isArray(cssSelectors) ? cssSelectors : [cssSelectors]).map(function(selector, animId, isCustomName) {
-                animId = selectorToAnimationMap[selector];
-                if (!animId) {
-                  isCustomName = selector[0] == "!";
-                  selectorToAnimationMap[selector] = animId = isCustomName ? selector.slice(1) : "sentinel-" + Math.random().toString(16).slice(2);
-                  cssRules[styleSheet.insertRule(
-                    "@keyframes " + animId + "{from{transform:none;}to{transform:none;}}",
-                    cssRules.length
-                  )]._id = selector;
-                  if (!isCustomName) {
-                    cssRules[styleSheet.insertRule(
-                      selector + "{animation-duration:0.0001s;animation-name:" + animId + ";}",
-                      cssRules.length
-                    )]._id = selector;
-                  }
-                  selectorToAnimationMap[selector] = animId;
-                }
-                (animationCallbacks[animId] = animationCallbacks[animId] || []).push(callback);
-              });
-            },
-            /**
-             * Remove watcher.
-             * @param {array} cssSelectors - List of CSS selector strings
-             * @param {Function} callback - The callback function (optional)
-             */
-            off: function(cssSelectors, callback) {
-              (isArray(cssSelectors) ? cssSelectors : [cssSelectors]).map(function(selector, animId, callbackList, i2) {
-                if (!(animId = selectorToAnimationMap[selector])) return;
-                callbackList = animationCallbacks[animId];
-                if (callback) {
-                  i2 = callbackList.length;
-                  while (i2--) {
-                    if (callbackList[i2] === callback) callbackList.splice(i2, 1);
-                  }
-                } else {
-                  callbackList = [];
-                }
-                if (callbackList.length) return;
-                i2 = cssRules.length;
-                while (i2--) {
-                  if (cssRules[i2]._id == selector) styleSheet.deleteRule(i2);
-                }
-                delete selectorToAnimationMap[selector];
-                delete animationCallbacks[animId];
-              });
-            },
-            /**
-             * Reset watchers and cache
-             */
-            reset: function() {
-              selectorToAnimationMap = {};
-              animationCallbacks = {};
-              if (styleEl) styleEl.parentNode.removeChild(styleEl);
-              styleEl = 0;
-            }
-          };
-        });
-      })(sentinel_umd);
-      var sentinel_umdExports = sentinel_umd.exports;
-      const sentinel = /* @__PURE__ */ getDefaultExportFromCjs(sentinel_umdExports);
       var dist = {};
       var __assign$1 = commonjsGlobal && commonjsGlobal.__assign || function() {
         __assign$1 = Object.assign || function(t2) {
@@ -2285,7 +2192,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
         "ul"
       ];
       const $8927f6f2acc4f386$export$250ffa63cdc0d034 = $8927f6f2acc4f386$var$NODES.reduce((primitive, node2) => {
-        const Node = /* @__PURE__ */ k$1((props, forwardedRef) => {
+        const Node2 = /* @__PURE__ */ k$1((props, forwardedRef) => {
           const { asChild, ...primitiveProps } = props;
           const Comp = asChild ? $5e63c961fc1ce211$export$8c6ed5c666ac1360 : node2;
           p$6(() => {
@@ -2295,10 +2202,10 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
             ref: forwardedRef
           }));
         });
-        Node.displayName = `Primitive.${node2}`;
+        Node2.displayName = `Primitive.${node2}`;
         return {
           ...primitive,
-          [node2]: Node
+          [node2]: Node2
         };
       }, {});
       function $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event) {
@@ -20925,7 +20832,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
       }
       function base64ToBlob(base64, mimeType) {
         const byteCharacters = atob(base64.split(",")[1]);
-        const byteNumbers = new Array(byteCharacters.length);
+        const byteNumbers = Array.from({ length: byteCharacters.length });
         for (let i2 = 0; i2 < byteCharacters.length; i2++) {
           byteNumbers[i2] = byteCharacters.charCodeAt(i2);
         }
@@ -20960,7 +20867,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
             }
           };
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -20998,7 +20905,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
             };
           }
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -21028,7 +20935,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
           const customMarker = ScriptStorage.get(KEY_IMAGE_CUSTOM_MARKER) || "[Image Omitted]";
           return customMarker;
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -21074,7 +20981,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
             };
           }
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -21142,7 +21049,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
          * Generate content string from processed images
          * This is a placeholder - actual content generation happens in export functions
          */
-        async generateContentFromImages(processedImages, format) {
+        async generateContentFromImages(processedImages, _format) {
           const content2 = "[CONTENT_PLACEHOLDER]";
           const files = [];
           if (this.currentStrategy === "separate_files") {
@@ -21296,7 +21203,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
         const { html: html2, exportFiles, imageMetadata } = await conversationToHtml(conversation, userAvatar, metaList);
         if (imageHandlingStrategy === "separate_files" && exportFiles && exportFiles.length > 0) {
           const { createExportZip } = await __vitePreload(async () => {
-            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-Car3I5mN-Zqjrt5hw.js');
+            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
             return { createExportZip: createExportZip2 };
           }, void 0 );
           const metadata = imageMetadata;
@@ -21317,7 +21224,7 @@ System.register("./__monkey.entry-Bw0ISNLo.js", ['jszip', 'html2canvas'], (funct
             "text/html"
           );
           const { generateZipFileName } = await __vitePreload(async () => {
-            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-Car3I5mN-Zqjrt5hw.js');
+            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
             return { generateZipFileName: generateZipFileName2 };
           }, void 0 );
           const zipFileName = generateZipFileName(conversation.title, imageHandlingStrategy);
@@ -21590,7 +21497,9 @@ ${content2.text}
                 return postProcess(`Result:
 \`\`\`
 ${content2.text}
-\`\`\`${imageContent ? "\n\n" + imageContent : ""}`);
+\`\`\`${imageContent ? `
+
+${imageContent}` : ""}`);
               }
             }
             return postProcess(`Result:
@@ -21947,7 +21856,7 @@ ${content2.text}
         const { markdown, exportFiles, imageMetadata } = await conversationToMarkdown(conversation, metaList);
         if (imageHandlingStrategy === "separate_files" && exportFiles && exportFiles.length > 0) {
           const { createExportZip } = await __vitePreload(async () => {
-            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-Car3I5mN-Zqjrt5hw.js');
+            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
             return { createExportZip: createExportZip2 };
           }, void 0 );
           const metadata = imageMetadata;
@@ -21968,7 +21877,7 @@ ${content2.text}
             "text/markdown"
           );
           const { generateZipFileName } = await __vitePreload(async () => {
-            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-Car3I5mN-Zqjrt5hw.js');
+            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
             return { generateZipFileName: generateZipFileName2 };
           }, void 0 );
           const zipFileName = generateZipFileName(conversation.title, imageHandlingStrategy);
@@ -22234,7 +22143,9 @@ ${content2.text}
                 return postProcess(`Result:
 \`\`\`
 ${content2.text}
-\`\`\`${imageContent ? "\n\n" + imageContent : ""}`);
+\`\`\`${imageContent ? `
+
+${imageContent}` : ""}`);
               }
             }
             return postProcess(`Result:
@@ -24133,85 +24044,270 @@ ${content2}`;
       function Menu({ container }) {
         return /* @__PURE__ */ o$8(SettingProvider, { children: /* @__PURE__ */ o$8(MenuInner, { container }) });
       }
+      function waitForReactHydration(callback, maxWaitTime = 1e4) {
+        const startTime = Date.now();
+        let checkCount = 0;
+        const maxChecks = 50;
+        function checkHydration() {
+          checkCount++;
+          const elapsed = Date.now() - startTime;
+          const isHydrated = (
+            // Check for React fiber nodes
+            document.querySelector("[data-fiber]") !== null || document.querySelector('[data-testid^="conversation-turn-"]') !== null || document.querySelector("[data-root]") !== null || document.querySelector("main") !== null
+          );
+          const reactActive = typeof window.React !== "undefined" || document.querySelector("[data-reactroot]") !== null || document.querySelector("[data-react-fiber]") !== null;
+          if (isHydrated && reactActive) {
+            setTimeout(() => {
+              callback();
+            }, 500);
+            return;
+          }
+          if (elapsed > maxWaitTime || checkCount >= maxChecks) {
+            try {
+              callback();
+            } catch {
+            }
+            return;
+          }
+          setTimeout(checkHydration, 200);
+        }
+        onloadSafe(() => {
+          setTimeout(checkHydration, 100);
+        });
+      }
+      function createSafeContainer(className = "chatgpt-exporter-container") {
+        const container = document.createElement("div");
+        container.className = className;
+        container.setAttribute("data-chatgpt-exporter", "true");
+        document.body.appendChild(container);
+        container.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        pointer-events: none;
+    `;
+        return container;
+      }
+      function safeInject(targetSelector, element2, position2 = "append", retryCount = 3) {
+        return new Promise((resolve) => {
+          let attempts = 0;
+          function attemptInjection() {
+            var _a, _b;
+            attempts++;
+            const target = document.querySelector(targetSelector);
+            if (!target) {
+              if (attempts < retryCount) {
+                setTimeout(attemptInjection, 500);
+                return;
+              } else {
+                resolve(false);
+                return;
+              }
+            }
+            try {
+              switch (position2) {
+                case "before":
+                  (_a = target.parentNode) == null ? void 0 : _a.insertBefore(element2, target);
+                  break;
+                case "after":
+                  (_b = target.parentNode) == null ? void 0 : _b.insertBefore(element2, target.nextSibling);
+                  break;
+                case "prepend":
+                  target.prepend(element2);
+                  break;
+                case "append":
+                default:
+                  target.append(element2);
+                  break;
+              }
+              resolve(true);
+            } catch {
+              if (attempts < retryCount) {
+                setTimeout(attemptInjection, 1e3);
+              } else {
+                resolve(false);
+              }
+            }
+          }
+          attemptInjection();
+        });
+      }
+      function createMenuContainer() {
+        const container = createSafeContainer("chatgpt-exporter-menu");
+        container.style.cssText += `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 10000;
+        pointer-events: auto;
+    `;
+        return container;
+      }
+      function safeInjectTimestamp(threadElement, timestamp2) {
+        try {
+          if (!threadElement.querySelector("time[data-chatgpt-exporter]")) {
+            threadElement.appendChild(timestamp2);
+          }
+        } catch {
+        }
+      }
+      function createSafeObserver(callback, options = { childList: true, subtree: true }) {
+        const observer = new MutationObserver((mutations) => {
+          const relevantMutations = mutations.filter(
+            (mutation) => !Array.from(mutation.addedNodes).some(
+              (node2) => node2.nodeType === Node.ELEMENT_NODE && node2.hasAttribute("data-chatgpt-exporter")
+            )
+          );
+          if (relevantMutations.length > 0) {
+            callback(relevantMutations);
+          }
+        });
+        observer.observe(document.body, options);
+        return observer;
+      }
+      function cleanupInjectedElements() {
+        const elements = document.querySelectorAll("[data-chatgpt-exporter]");
+        elements.forEach((element2) => {
+          if (element2.parentNode) {
+            element2.parentNode.removeChild(element2);
+          }
+        });
+      }
       main();
       function main() {
         onloadSafe(() => {
           const styleEl = document.createElement("style");
-          styleEl.id = "sentinel-css";
+          styleEl.id = "chatgpt-exporter-css";
           document.head.append(styleEl);
-          const injectionMap = /* @__PURE__ */ new Map();
-          const injectNavMenu = (nav) => {
-            if (injectionMap.has(nav)) return;
-            const container = getMenuContainer();
-            injectionMap.set(nav, container);
-            const chatList = nav.querySelector(":scope > div.sticky.bottom-0");
-            if (chatList) {
-              chatList.prepend(container);
-            } else {
-              container.style.backgroundColor = "#171717";
-              container.style.position = "sticky";
-              container.style.bottom = "72px";
-              nav.append(container);
-            }
-          };
-          sentinel.on("nav", injectNavMenu);
-          setInterval(() => {
-            injectionMap.forEach((container, nav) => {
-              if (!nav.isConnected) {
-                container.remove();
-                injectionMap.delete(nav);
+          waitForReactHydration(() => {
+            initializeSafeInjection();
+          });
+        });
+        window.addEventListener("beforeunload", cleanupInjectedElements);
+      }
+      function initializeSafeInjection() {
+        const injectionMap = /* @__PURE__ */ new Map();
+        createSafeObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node2) => {
+              if (node2.nodeType === Node.ELEMENT_NODE) {
+                const element2 = node2;
+                if (element2.tagName === "NAV") {
+                  handleNavInjection(element2);
+                }
               }
-            });
-            const navList = Array.from(document.querySelectorAll("nav")).filter((nav) => !injectionMap.has(nav));
-            navList.forEach(injectNavMenu);
-          }, 300);
-          if (isSharePage()) {
-            sentinel.on(`div[role="presentation"] > .w-full > div >.flex.w-full`, (target) => {
-              target.prepend(getMenuContainer());
-            });
-          }
-          let chatId = "";
-          sentinel.on('[role="presentation"]', async () => {
-            const currentChatId = getChatIdFromUrl();
-            if (!currentChatId || currentChatId === chatId) return;
-            chatId = currentChatId;
-            const rawConversation = await fetchConversation(chatId, false);
-            const { conversationNodes } = processConversation(rawConversation);
-            const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'));
-            if (threadContents.length === 0) return;
-            threadContents.forEach((thread, index2) => {
-              var _a, _b;
-              const createTime = (_b = (_a = conversationNodes[index2]) == null ? void 0 : _a.message) == null ? void 0 : _b.create_time;
-              if (!createTime) return;
-              const date = new Date(createTime * 1e3);
-              const timestamp2 = document.createElement("time");
-              timestamp2.className = "w-full text-gray-500 dark:text-gray-400 text-sm text-right";
-              timestamp2.dateTime = date.toISOString();
-              timestamp2.title = date.toLocaleString();
-              const hour12 = document.createElement("span");
-              hour12.setAttribute("data-time-format", "12");
-              hour12.textContent = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-              const hour24 = document.createElement("span");
-              hour24.setAttribute("data-time-format", "24");
-              hour24.textContent = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
-              timestamp2.append(hour12, hour24);
-              thread.append(timestamp2);
             });
           });
         });
-      }
-      function getMenuContainer() {
-        const container = document.createElement("div");
-        container.style.zIndex = "99";
-        D$4(/* @__PURE__ */ o$8(Menu, { container }), container);
-        return container;
+        injectMenu();
+        if (isSharePage()) {
+          injectSharePageMenu();
+        }
+        initializeTimestampInjection();
+        function handleNavInjection(nav) {
+          if (injectionMap.has(nav)) return;
+          const menuContainer = createMenuContainer();
+          injectionMap.set(nav, menuContainer);
+          D$4(/* @__PURE__ */ o$8(Menu, { container: menuContainer }), menuContainer);
+          const chatList = nav.querySelector(":scope > div.sticky.bottom-0");
+          if (chatList) {
+            if (!chatList.hasAttribute("data-react") && !chatList.querySelector("[data-testid]")) {
+              safeInject(`nav:has(${getSelectorForElement(chatList)})`, menuContainer, "after");
+            }
+          }
+        }
+        function injectMenu() {
+          const menuContainer = createMenuContainer();
+          menuContainer.style.cssText += `
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            padding: 8px;
+        `;
+          D$4(/* @__PURE__ */ o$8(Menu, { container: menuContainer }), menuContainer);
+        }
+        function injectSharePageMenu() {
+          const menuContainer = createMenuContainer();
+          menuContainer.style.cssText += `
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            padding: 8px;
+        `;
+          setTimeout(() => {
+            const contentArea = document.querySelector('div[role="presentation"] > .w-full > div > .flex.w-full');
+            if (contentArea) {
+              D$4(/* @__PURE__ */ o$8(Menu, { container: menuContainer }), menuContainer);
+            }
+          }, 1e3);
+        }
+        function initializeTimestampInjection() {
+          let chatId = "";
+          let lastInjectionTime = 0;
+          createSafeObserver((mutations) => {
+            const now = Date.now();
+            if (now - lastInjectionTime < 1e3) return;
+            const newMessages = mutations.flatMap((m2) => Array.from(m2.addedNodes)).filter(
+              (node2) => node2.nodeType === Node.ELEMENT_NODE && node2.querySelector('[data-testid^="conversation-turn-"]')
+            );
+            if (newMessages.length > 0) {
+              handleTimestampInjection();
+              lastInjectionTime = now;
+            }
+          });
+          handleTimestampInjection();
+          function handleTimestampInjection() {
+            const currentChatId = getChatIdFromUrl();
+            if (!currentChatId || currentChatId === chatId) return;
+            chatId = currentChatId;
+            fetchConversation(chatId, false).then((rawConversation) => {
+              const { conversationNodes } = processConversation(rawConversation);
+              safeInjectTimestamps(conversationNodes);
+            }).catch(() => {
+            });
+          }
+          function safeInjectTimestamps(conversationNodes) {
+            const threadElements = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'));
+            threadElements.forEach((thread, index2) => {
+              var _a, _b;
+              const createTime = (_b = (_a = conversationNodes[index2]) == null ? void 0 : _a.message) == null ? void 0 : _b.create_time;
+              if (!createTime) return;
+              if (thread.querySelector("time[data-chatgpt-exporter]")) return;
+              try {
+                const date = new Date(createTime * 1e3);
+                const timestamp2 = document.createElement("time");
+                timestamp2.setAttribute("data-chatgpt-exporter", "true");
+                timestamp2.className = "w-full text-gray-500 dark:text-gray-400 text-sm text-right";
+                timestamp2.dateTime = date.toISOString();
+                timestamp2.title = date.toLocaleString();
+                const hour12 = document.createElement("span");
+                hour12.setAttribute("data-time-format", "12");
+                hour12.textContent = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+                const hour24 = document.createElement("span");
+                hour24.setAttribute("data-time-format", "24");
+                hour24.textContent = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+                timestamp2.append(hour12, hour24);
+                safeInjectTimestamp(thread, timestamp2);
+              } catch {
+              }
+            });
+          }
+        }
+        function getSelectorForElement(element2) {
+          if (element2.id) return `#${element2.id}`;
+          if (element2.className) return `.${element2.className.split(" ")[0]}`;
+          return element2.tagName.toLowerCase();
+        }
       }
 
     })
   };
 }));
 
-System.register("./zip-packager-Car3I5mN-Zqjrt5hw.js", ['jszip', './__monkey.entry-Bw0ISNLo.js', 'html2canvas'], (function (exports, module) {
+System.register("./zip-packager-skkIlKmj-nCZZjrcW.js", ['jszip', './__monkey.entry-ZrX23HSs.js', 'html2canvas'], (function (exports, module) {
   'use strict';
   var JSZip, sanitizeFileName;
   return {
@@ -24239,14 +24335,14 @@ System.register("./zip-packager-Car3I5mN-Zqjrt5hw.js", ['jszip', './__monkey.ent
         /**
          * Add main content file to ZIP
          */
-        addContentFile(fileName, content, mimeType = "text/plain") {
+        addContentFile(fileName, content, _mimeType = "text/plain") {
           this.zip.file(fileName, content);
           return this;
         }
         /**
          * Add image file to ZIP
          */
-        addImageFile(relativePath, data, mimeType) {
+        addImageFile(relativePath, data, _mimeType) {
           this.zip.file(relativePath, data);
           return this;
         }
@@ -24413,7 +24509,7 @@ System.register("./zip-packager-Car3I5mN-Zqjrt5hw.js", ['jszip', './__monkey.ent
           return totalSize;
         }
       } exports("ZipPackager", ZipPackager);
-      async function createExportZip(mainFileName, mainContent, imageFiles = [], metadata, mimeType = "text/plain") {
+      async function createExportZip(mainFileName, mainContent, imageFiles = [], metadata, _mimeType = "text/plain") {
         const packager = new ZipPackager();
         packager.addContentFile(mainFileName, mainContent, mimeType);
         if (imageFiles.length > 0) {
@@ -24428,9 +24524,9 @@ System.register("./zip-packager-Car3I5mN-Zqjrt5hw.js", ['jszip', './__monkey.ent
         const timeStr = date.toTimeString().split(" ")[0].replace(/:/g, "");
         const sanitizedTitle = sanitizeFileName(conversationTitle).substring(0, 50);
         const strategyPrefix = {
-          "embed_base64": "embedded",
-          "text_marker": "markers",
-          "separate_files": "separate"
+          embed_base64: "embedded",
+          text_marker: "markers",
+          separate_files: "separate"
         }[strategy] || strategy;
         return `chatgpt-export-${strategyPrefix}-${sanitizedTitle}-${dateStr}-${timeStr}.zip`;
       }
