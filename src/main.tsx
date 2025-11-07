@@ -1,5 +1,4 @@
 import { render } from 'preact'
-import sentinel from 'sentinel-js'
 import { fetchConversation, processConversation } from './api'
 import { getChatIdFromUrl, isSharePage } from './page'
 import { Menu } from './ui/Menu'
@@ -75,7 +74,7 @@ function initializeSafeInjection() {
         injectionMap.set(nav, menuContainer)
 
         // Render our menu component
-        render(<Menu container={menuContainer} />, menuContainer)
+        render(<Menu container={menuContainer as HTMLDivElement} />, menuContainer)
 
         // Try to find a safe injection point
         const chatList = nav.querySelector(':scope > div.sticky.bottom-0')
@@ -99,7 +98,7 @@ function initializeSafeInjection() {
         `
 
         // Render our menu
-        render(<Menu container={menuContainer} />, menuContainer)
+        render(<Menu container={menuContainer as HTMLDivElement} />, menuContainer)
     }
 
     function injectSharePageMenu() {
@@ -118,7 +117,7 @@ function initializeSafeInjection() {
             const contentArea = document.querySelector('div[role="presentation"] > .w-full > div > .flex.w-full')
             if (contentArea) {
                 // Create our own container, don't inject into existing elements
-                render(<Menu container={menuContainer} />, menuContainer)
+                render(<Menu container={menuContainer as HTMLDivElement} />, menuContainer)
             }
         }, 1000)
     }

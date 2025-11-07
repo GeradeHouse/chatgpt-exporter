@@ -10,7 +10,6 @@ import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, getColorScheme, timestamp, unixTimestampToISOString } from '../utils/utils'
 import { getImageHandler, initializeImageHandler } from './image-handler'
-import { getCurrentTimestamp } from './image-utils'
 import type { ExportFile, ExportMetadata, ImageContext, ProcessedImage } from './image-types'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
@@ -135,9 +134,9 @@ async function conversationToHtml(conversation: ConversationResult, avatar: stri
     let imageMetadata: ExportMetadata | undefined
     if (images.length > 0) {
         const imageResult = await imageHandler.processConversationImages(images, 'html')
-        processedImages = imageResult.processedImages || []
-        exportFiles = imageResult.files || []
-        imageMetadata = imageResult.metadata
+        processedImages = (imageResult as any).processedImages || []
+        exportFiles = (imageResult as any).files || []
+        imageMetadata = (imageResult as any).metadata
     }
 
     const conversationHtml = []
@@ -373,20 +372,20 @@ function extractImagesFromConversation(conversation: ConversationResult): Array<
         }
         else if (message.content.content_type === 'multimodal_text' && message.content.parts) {
             message.content.parts.forEach((part) => {
-                if (part.content_type === 'image_asset_pointer' && part.asset_pointer) {
+                if (typeof part === 'object' && 'content_type' in part && 'asset_pointer' in part && (part as any).content_type === 'image_asset_pointer') {
                     const imageContext: ImageContext = {
                         conversationId: conversation.id,
                         messageId: message.id || `node-${nodeIndex}`,
                         imageIndex: imageIndex++,
                         mimeType: 'image/png', // Will be detected properly
-                        originalUrl: part.asset_pointer,
+                        originalUrl: (part as any).asset_pointer,
                         contentType: 'multimodal_text',
                         author: message.author,
                         timestamp: message.create_time,
                     }
 
                     images.push({
-                        url: part.asset_pointer,
+                        url: (part as any).asset_pointer,
                         context: imageContext,
                     })
                 }
@@ -466,10 +465,10 @@ async function transformContent(
         case 'multimodal_text': {
             const parts = content.parts?.map((part, partIndex) => {
                 if (typeof part === 'string') return postProcess(part)
-                if (part.content_type === 'image_asset_pointer') {
+                if (typeof part === 'object' && 'content_type' in part && part.content_type === 'image_asset_pointer') {
                     // Calculate the correct global image index for this specific image
                     const imageIndexInMessage = content.parts?.slice(0, partIndex).filter(p =>
-                        typeof p === 'object' && p.content_type === 'image_asset_pointer',
+                        typeof p === 'object' && 'content_type' in p && p.content_type === 'image_asset_pointer',
                     ).length || 0
                     const globalImageIndex = imageStartIndex + imageIndexInMessage
 
@@ -481,9 +480,11 @@ async function transformContent(
 
                     return `[IMAGE_${globalImageIndex}]`
                 }
-                if (part.content_type === 'audio_transcription') return `<div style="font-style: italic; opacity: 0.65;">"${part.text}"</div>`
-                if (part.content_type === 'audio_asset_pointer') return null
-                if (part.content_type === 'real_time_user_audio_video_asset_pointer') return null
+                if (typeof part === 'object' && 'content_type' in part && part.content_type === 'audio_transcription') {
+                    return `<div style="font-style: italic; opacity: 0.65;">"${(part as any).text}"</div>`
+                }
+                if (typeof part === 'object' && 'content_type' in part && part.content_type === 'audio_asset_pointer') return null
+                if (typeof part === 'object' && 'content_type' in part && part.content_type === 'real_time_user_audio_video_asset_pointer') return null
                 return postProcess('[Unsupported multimodal content]')
             }) || []
 
