@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'preact/hooks'
+
 import './CheckBox.css'
 import { IconCheckBox, IconCheckBoxChecked } from './Icons'
+import type { FC } from '../type'
 
 export interface CheckBoxProps {
     className?: string
@@ -10,7 +12,7 @@ export interface CheckBoxProps {
     onCheckedChange?: (checked: boolean) => void
 }
 
-export const CheckBox: React.FC<CheckBoxProps> = ({
+export const CheckBox: FC<CheckBoxProps> = ({
     className,
     checked = false,
     disabled,
@@ -18,8 +20,9 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
     onCheckedChange,
 }) => {
     const [isChecked, setChecked] = useState(checked)
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.currentTarget.checked
+    const onChange = (e: Event) => {
+        const target = e.target as HTMLInputElement
+        const newValue = target.checked
         setChecked(newValue)
         onCheckedChange?.(newValue)
     }

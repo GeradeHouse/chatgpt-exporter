@@ -1,4 +1,6 @@
+// Import Radix UI components with proper types
 import * as Dialog from '@radix-ui/react-dialog'
+import { h } from 'preact'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
 import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchProjects } from '../api'
@@ -11,6 +13,7 @@ import { IconCross, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
 import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
 import type { FC } from '../type'
+
 import type { ChangeEvent } from 'preact/compat'
 
 interface ProjectSelectProps {
@@ -307,7 +310,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
 
     return (
         <>
-            <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
+            {(Dialog.Title as any)({ className: 'DialogTitle' }, t('Export Dialog Title'))}
             <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700">
                 {t('Export from official export file')} (conversations.json)&nbsp;
                 {exportSource === 'API' && (
@@ -365,11 +368,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                     </div>
                 </>
             )}
-            <Dialog.Close asChild>
-                <button className="IconButton CloseButton" aria-label="Close">
-                    <IconCross />
-                </button>
-            </Dialog.Close>
+            {(Dialog.Close as any)({ asChild: true }, h('button', { 'className': 'IconButton CloseButton', 'aria-label': 'Close' }, h(IconCross, null)))}
         </>
     )
 }
@@ -382,19 +381,19 @@ interface ExportDialogProps {
 
 export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
     return (
-        <Dialog.Root
-            open={open}
-            onOpenChange={onOpenChange}
-        >
-            <Dialog.Trigger asChild>
-                {children}
-            </Dialog.Trigger>
-            <Dialog.Portal>
-                <Dialog.Overlay className="DialogOverlay" />
-                <Dialog.Content className="DialogContent">
-                    {open && <DialogContent format={format} />}
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+        (Dialog.Root as any)(
+            { open, onOpenChange },
+            (Dialog.Trigger as any)(
+                { asChild: true },
+                children,
+            ),
+            (Dialog.Portal as any)(
+                (Dialog.Overlay as any)({ className: 'DialogOverlay' }),
+                (Dialog.Content as any)(
+                    { className: 'DialogContent' },
+                    open && (DialogContent as any)({ format }),
+                ),
+            ),
+        )
     )
 }

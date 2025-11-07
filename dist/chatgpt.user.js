@@ -622,7 +622,7 @@ System.addImportMap({ imports: {"html2canvas":"user:html2canvas","jszip":"user:j
 System.set("user:html2canvas", (()=>{const _=html2canvas;('default' in _)||(_.default=_);return _})());
 System.set("user:jszip", (()=>{const _=JSZip;('default' in _)||(_.default=_);return _})());
 
-System.register("./__entry.js", ['./__monkey.entry-BlCgl1t6.js'], (function (exports, module) {
+System.register("./__entry.js", ['./__monkey.entry-CrzspVDb.js'], (function (exports, module) {
 	'use strict';
 	return {
 		setters: [null],
@@ -634,7 +634,7 @@ System.register("./__entry.js", ['./__monkey.entry-BlCgl1t6.js'], (function (exp
 	};
 }));
 
-System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (function (exports, module) {
+System.register("./__monkey.entry-CrzspVDb.js", ['jszip', 'html2canvas'], (function (exports, module) {
   'use strict';
   var JSZip, html2canvas;
   return {
@@ -20832,10 +20832,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
       }
       function base64ToBlob(base64, mimeType) {
         const byteCharacters = atob(base64.split(",")[1]);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i2 = 0; i2 < byteCharacters.length; i2++) {
-          byteNumbers[i2] = byteCharacters.charCodeAt(i2);
-        }
+        const byteNumbers = [...byteCharacters].map((char) => char.charCodeAt(0));
         const byteArray = new Uint8Array(byteNumbers);
         return new Blob([byteArray], { type: mimeType });
       }
@@ -20867,7 +20864,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
             }
           };
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -20905,7 +20902,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
             };
           }
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -20935,7 +20932,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
           const customMarker = ScriptStorage.get(KEY_IMAGE_CUSTOM_MARKER) || "[Image Omitted]";
           return customMarker;
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -20981,7 +20978,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
             };
           }
         }
-        generateContent(processedImages, originalContent, format) {
+        generateContent(processedImages, originalContent, _format) {
           return originalContent;
         }
       }
@@ -21038,7 +21035,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
           );
           const result = await this.generateContentFromImages(processedImages, format);
           if (this.currentStrategy === "separate_files" && result.files && result.files.length > 0) {
-            result.metadata = this.generateExportMetadata(processedImages);
+            result.metadata = this.generateExportMetadata(processedImages, images);
           }
           return {
             ...result,
@@ -21049,7 +21046,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
          * Generate content string from processed images
          * This is a placeholder - actual content generation happens in export functions
          */
-        async generateContentFromImages(processedImages, format) {
+        async generateContentFromImages(processedImages, _format) {
           const content2 = "[CONTENT_PLACEHOLDER]";
           const files = [];
           if (this.currentStrategy === "separate_files") {
@@ -21073,19 +21070,24 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
         /**
          * Generate export metadata for Option 3
          */
-        generateExportMetadata(processedImages) {
-          const imageMetadata = processedImages.filter((img) => img.metadata && img.fileName).map((img) => ({
-            id: img.id,
-            originalUrl: img.metadata.originalUrl,
-            fileName: img.fileName,
-            mimeType: img.metadata.mimeType,
-            size: img.metadata.fileSize || 0,
-            messageContext: img.metadata.messageContext || {
-              messageId: "",
-              author: "unknown",
-              role: "unknown"
-            }
-          }));
+        generateExportMetadata(processedImages, images) {
+          const imageMetadata = processedImages.filter((img) => img.metadata && img.fileName).map((img, index2) => {
+            var _a, _b, _c;
+            const originalContext = (_a = images[index2]) == null ? void 0 : _a.context;
+            return {
+              id: img.id,
+              originalUrl: img.metadata.originalUrl,
+              fileName: img.fileName,
+              mimeType: img.metadata.mimeType,
+              size: img.metadata.fileSize || 0,
+              messageContext: {
+                messageId: (originalContext == null ? void 0 : originalContext.messageId) || "",
+                author: ((_b = img.metadata.messageContext) == null ? void 0 : _b.author) || "unknown",
+                role: ((_c = img.metadata.messageContext) == null ? void 0 : _c.role) || "unknown",
+                timestamp: img.metadata.timestamp
+              }
+            };
+          });
           return {
             version: "1.0.0",
             exportDate: getCurrentTimestamp(),
@@ -21203,7 +21205,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
         const { html: html2, exportFiles, imageMetadata } = await conversationToHtml(conversation, userAvatar, metaList);
         if (imageHandlingStrategy === "separate_files" && exportFiles && exportFiles.length > 0) {
           const { createExportZip } = await __vitePreload(async () => {
-            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
+            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-Di8Zv63p-UpvySm9O.js');
             return { createExportZip: createExportZip2 };
           }, void 0 );
           const metadata = imageMetadata;
@@ -21224,7 +21226,7 @@ System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (funct
             "text/html"
           );
           const { generateZipFileName } = await __vitePreload(async () => {
-            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
+            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-Di8Zv63p-UpvySm9O.js');
             return { generateZipFileName: generateZipFileName2 };
           }, void 0 );
           const zipFileName = generateZipFileName(conversation.title, imageHandlingStrategy);
@@ -21856,7 +21858,7 @@ ${content2.text}
         const { markdown, exportFiles, imageMetadata } = await conversationToMarkdown(conversation, metaList);
         if (imageHandlingStrategy === "separate_files" && exportFiles && exportFiles.length > 0) {
           const { createExportZip } = await __vitePreload(async () => {
-            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
+            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-Di8Zv63p-UpvySm9O.js');
             return { createExportZip: createExportZip2 };
           }, void 0 );
           const metadata = imageMetadata;
@@ -21877,7 +21879,7 @@ ${content2.text}
             "text/markdown"
           );
           const { generateZipFileName } = await __vitePreload(async () => {
-            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
+            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-Di8Zv63p-UpvySm9O.js');
             return { generateZipFileName: generateZipFileName2 };
           }, void 0 );
           const zipFileName = generateZipFileName(conversation.title, imageHandlingStrategy);
@@ -23388,13 +23390,14 @@ ${content2}`;
         }, [u2, a2]), wn.createElement(wn.Fragment, null, l2 != null && o$12 && wn.createElement(c, { features: p.Hidden, ...R({ as: "input", type: "checkbox", hidden: true, readOnly: true, form: b2, checked: o$12, name: l2, value: T$12 }) }), X({ ourProps: R$12, theirProps: d2, slot: G2, defaultTag: ee, name: "Switch" }));
       }
       let ne = D(te), re = Z, Ge = Object.assign(ne, { Group: re, Label: M, Description: b });
-      function Toggle({ label, checked = true, onCheckedUpdate }) {
+      function Toggle({ label, checked = true, onCheckedUpdate, onChange }) {
+        const handleChange = onChange || onCheckedUpdate;
         return /* @__PURE__ */ o$8("div", { className: "inline-flex items-center", children: [
           /* @__PURE__ */ o$8(
             Ge,
             {
               checked,
-              onChange: onCheckedUpdate,
+              onChange: handleChange,
               "data-state": checked ? "checked" : "unchecked",
               className: "toggle-switch",
               children: /* @__PURE__ */ o$8(
@@ -24307,7 +24310,7 @@ ${content2}`;
   };
 }));
 
-System.register("./zip-packager-DbpWUpir-BoUwajsC.js", ['jszip', './__monkey.entry-BlCgl1t6.js', 'html2canvas'], (function (exports, module) {
+System.register("./zip-packager-Di8Zv63p-UpvySm9O.js", ['jszip', './__monkey.entry-CrzspVDb.js', 'html2canvas'], (function (exports, module) {
   'use strict';
   var JSZip, sanitizeFileName;
   return {
@@ -24335,14 +24338,14 @@ System.register("./zip-packager-DbpWUpir-BoUwajsC.js", ['jszip', './__monkey.ent
         /**
          * Add main content file to ZIP
          */
-        addContentFile(fileName, content, mimeType = "text/plain") {
+        addContentFile(fileName, content, _mimeType = "text/plain") {
           this.zip.file(fileName, content);
           return this;
         }
         /**
          * Add image file to ZIP
          */
-        addImageFile(relativePath, data, mimeType) {
+        addImageFile(relativePath, data, _mimeType) {
           this.zip.file(relativePath, data);
           return this;
         }
@@ -24497,9 +24500,10 @@ System.register("./zip-packager-DbpWUpir-BoUwajsC.js", ['jszip', './__monkey.ent
         getEstimatedSize() {
           let totalSize = 0;
           Object.keys(this.zip.files).forEach((fileName) => {
+            var _a;
             const file = this.zip.files[fileName];
             if (file && !file.dir) {
-              totalSize += file._data.uncompressedSize || 0;
+              totalSize += ((_a = file._data) == null ? void 0 : _a.uncompressedSize) || 0;
             }
           });
           if (this.metadata) {
@@ -24523,11 +24527,12 @@ System.register("./zip-packager-DbpWUpir-BoUwajsC.js", ['jszip', './__monkey.ent
         const dateStr = date.toISOString().split("T")[0];
         const timeStr = date.toTimeString().split(" ")[0].replace(/:/g, "");
         const sanitizedTitle = sanitizeFileName(conversationTitle).substring(0, 50);
-        const strategyPrefix = {
-          "embed_base64": "embedded",
-          "text_marker": "markers",
-          "separate_files": "separate"
-        }[strategy] || strategy;
+        const strategyPrefixMap = {
+          embed_base64: "embedded",
+          text_marker: "markers",
+          separate_files: "separate"
+        };
+        const strategyPrefix = strategyPrefixMap[strategy] || strategy;
         return `chatgpt-export-${strategyPrefix}-${sanitizedTitle}-${dateStr}-${timeStr}.zip`;
       }
 
