@@ -1,15 +1,10 @@
 import { KEY_IMAGE_CUSTOM_MARKER } from '../constants'
 import { ScriptStorage } from '../utils/storage'
 import {
-    ImageMetadata,
-} from './image-types'
-import {
-    base64ToBlob,
     createImageRelativePath,
     generateImageFileName,
     generateImageId,
     getBase64FromImageUrl,
-    getCurrentTimestamp,
     getFileSizeFromBase64,
     getMimeType,
     sanitizeFileName,
@@ -44,9 +39,8 @@ abstract class BaseImageProcessor implements ImageProcessor {
     }
 
     generateContent(
-        processedImages: ProcessedImage[],
+        _processedImages: ProcessedImage[],
         originalContent: string,
-        _format: 'markdown' | 'html' | 'json',
     ): string {
         // Base implementation - should be overridden by subclasses
         return originalContent
@@ -97,9 +91,8 @@ class EmbedBase64Strategy extends BaseImageProcessor {
     }
 
     generateContent(
-        processedImages: ProcessedImage[],
+        _processedImages: ProcessedImage[],
         originalContent: string,
-        _format: 'markdown' | 'html' | 'json',
     ): string {
         // This is a simplified version - the actual replacement will be done in the integration layer
         return originalContent
@@ -145,9 +138,8 @@ class TextMarkerStrategy extends BaseImageProcessor {
     }
 
     generateContent(
-        processedImages: ProcessedImage[],
+        _processedImages: ProcessedImage[],
         originalContent: string,
-        _format: 'markdown' | 'html' | 'json',
     ): string {
         return originalContent
     }
@@ -206,9 +198,8 @@ class SeparateFilesStrategy extends BaseImageProcessor {
     }
 
     generateContent(
-        processedImages: ProcessedImage[],
+        _processedImages: ProcessedImage[],
         originalContent: string,
-        _format: 'markdown' | 'html' | 'json',
     ): string {
         return originalContent
     }

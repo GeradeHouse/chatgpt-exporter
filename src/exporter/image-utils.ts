@@ -1,4 +1,3 @@
-import { ImageMetadata, ProcessedImage } from './image-types'
 import type { ImageContext } from './image-types'
 
 /**
@@ -107,10 +106,7 @@ export function generateImageFileName(
  */
 export function base64ToBlob(base64: string, mimeType: string): Blob {
     const byteCharacters = atob(base64.split(',')[1])
-    const byteNumbers = Array.from({ length: byteCharacters.length })
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
-    }
+    const byteNumbers = [...byteCharacters].map(char => char.charCodeAt(0))
     const byteArray = new Uint8Array(byteNumbers)
     return new Blob([byteArray], { type: mimeType })
 }
@@ -151,9 +147,14 @@ export function getCurrentTimestamp(): string {
  * Validate image URL (basic validation)
  */
 export function isValidImageUrl(url: string): boolean {
-    // Simple URL validation using regex
-    const urlPattern = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i
-    return urlPattern.test(url)
+    try {
+        // eslint-disable-next-line no-new
+        new URL(url)
+        return true
+    }
+    catch {
+        return false
+    }
 }
 
 /**
@@ -164,7 +165,7 @@ export async function getImageDimensions(
     context?: ImageContext,
 ): Promise<{ width: number; height: number } | null> {
     // If we have dimensions in context, use them
-    if (context && context.metadata?.width && context.metadata?.height) {
+    if (context && context.metadata?.width !== undefined && context.metadata?.height !== undefined) {
         return {
             width: context.metadata.width,
             height: context.metadata.height,

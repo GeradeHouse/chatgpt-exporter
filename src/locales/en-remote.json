@@ -1,0 +1,108 @@
+{
+  "ChatGPT Exporter": "ChatGPT Exporter",
+  "Settings": "Settings",
+  "Export": "Export",
+  "Export as Markdown": "Export as Markdown",
+  "Export as HTML": "Export as HTML",
+  "Export as JSON": "Export as JSON",
+  "Export as PNG": "Export as PNG",
+  "Export All": "Export All",
+  "Cancel": "Cancel",
+  "Save": "Save",
+  "Close": "Close",
+  "Loading": "Loading...",
+  "Error": "Error",
+  "Success": "Success",
+
+  "Conversation Timestamp": "Conversation Timestamp",
+  "Conversation Timestamp Description": "Will show on the page.",
+
+  "Image Handling": "Image Handling",
+  "Image Handling Description": "Configure how images are handled in exports",
+  "Embed Images": "Embed Images (current behavior)",
+  "Embed Images Description": "Images are embedded as base64 data in the content",
+  "Text Markers": "Replace with Text Markers",
+  "Text Markers Description": "Images are replaced with customizable text placeholders",
+  "Separate Files": "Separate Files in ZIP Archive",
+  "Separate Files Description": "Images are saved as separate files with relative links in a ZIP archive",
+  "Advanced Options": "Advanced Options",
+  "Image Quality": "Image Quality",
+  "Max Image Size": "Max Image Size",
+  "Include Image Metadata": "Include Image Metadata",
+  "Image Handling Preview": "Preview",
+  "Custom Marker Text": "Custom Marker Text",
+  "Reset to Defaults": "Reset to Defaults",
+
+  "Export Settings": "Export Settings",
+  "Export Format": "Export Format",
+  "File Name Format": "File Name Format",
+  "Include Metadata": "Include Metadata",
+  "Auto Fetch Conversations": "Auto Fetch Conversations",
+  "Hide Sidebar": "Hide Sidebar",
+  "Minimize to Tray": "Minimize to Tray",
+
+  "File Formats": {
+    "Markdown": "Markdown",
+    "HTML": "HTML",
+    "JSON": "JSON",
+    "PNG": "PNG Screenshot"
+  },
+
+  "Image Handling Strategies": {
+    "embed_base64": {
+      "title": "Embed Images (current behavior)",
+      "description": "Images are embedded as base64 data in the content",
+      "preview": "![image](data:image/png;base64,iVBORw0...)"
+    },
+    "text_marker": {
+      "title": "Replace with Text Markers",
+      "description": "Images are replaced with customizable text placeholders",
+      "preview": "[Image Omitted]"
+    },
+    "separate_files": {
+      "title": "Separate Files in ZIP Archive",
+      "description": "Images are saved as separate files with relative links in a ZIP archive",
+      "preview": "![image](images/chatgpt-response-001.png)"
+    }
+  },
+
+  "Messages": {
+    "conversation_not_found": "Conversation not found",
+    "export_failed": "Export failed",
+    "image_processing_failed": "Image processing failed",
+    "zip_creation_failed": "ZIP creation failed",
+    "settings_save_failed": "Failed to save settings",
+    "invalid_image_url": "Invalid image URL",
+    "network_error": "Network error occurred",
+    "export_successful": "Export completed successfully",
+    "settings_saved": "Settings saved successfully",
+    "conversation_fetched": "Conversation data fetched",
+    "images_processed": "Images processed successfully"
+  },
+
+  "UI": {
+    "strategy_radio_label": "Select image handling strategy",
+    "advanced_options_toggle": "Show advanced options",
+    "strategy_preview_label": "Preview of selected strategy",
+    "image_quality_label": "Adjust image compression quality",
+    "image_size_label": "Maximum image dimension in pixels",
+    "metadata_toggle": "Include detailed image information in exports"
+  },
+
+  "Validation": {
+    "custom_marker_required": "Custom marker text is required",
+    "custom_marker_too_long": "Custom marker text is too long (max 100 characters)",
+    "invalid_quality_value": "Image quality must be between 10% and 100%",
+    "invalid_size_value": "Max image size must be between 512px and 4096px"
+  },
+
+  "Help": {
+    "image_handling_help": "Choose how images are handled when exporting conversations. Each option has different benefits for file size, organization, and compatibility.",
+    "embed_help": "Maintains current behavior. Images are embedded directly in the export file as base64 data. Results in self-contained files but larger file sizes.",
+    "text_marker_help": "Replaces images with customizable text markers. Best for text-focused workflows and when you want minimal file sizes.",
+    "separate_files_help": "Creates a professional ZIP archive with images organized in a separate directory. Best for sharing and organization.",
+    "quality_help": "Controls the compression level for images in ZIP exports. Higher values preserve image quality but result in larger files.",
+    "size_help": "Maximum dimension for images in ZIP exports. Images larger than this will be resized to fit within this limit.",
+    "metadata_help": "Include detailed information about images in the export metadata, such as original URLs, dimensions, and processing details."
+  }
+}

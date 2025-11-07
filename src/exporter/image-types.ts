@@ -21,6 +21,10 @@ export interface ImageContext {
         name?: string
     }
     timestamp?: number
+    metadata?: {
+        width?: number
+        height?: number
+    }
 }
 
 export interface ProcessedImage {
@@ -62,8 +66,8 @@ export interface ExportMetadata {
         fileName: string
         mimeType: string
         size: number
-        messageContext: {
-            messageId: string
+        messageContext?: {
+            messageId?: string
             author: string
             role: string
             timestamp?: number

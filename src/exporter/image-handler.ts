@@ -1,5 +1,8 @@
 import { createImageProcessor, getAvailableStrategies } from './image-strategies'
-import { base64ToBlob, getCurrentTimestamp, sanitizeFileName } from './image-utils'
+import {
+    base64ToBlob,
+    getCurrentTimestamp,
+} from './image-utils'
 import type {
     ExportFile,
     ExportMetadata,
@@ -78,7 +81,7 @@ export class DefaultImageHandler implements ImageHandler {
 
         // Add metadata for Option 3
         if (this.currentStrategy === 'separate_files' && result.files && result.files.length > 0) {
-            result.metadata = this.generateExportMetadata(processedImages)
+            (result as any).metadata = this.generateExportMetadata(processedImages, images)
         }
 
         return {
@@ -124,21 +127,25 @@ export class DefaultImageHandler implements ImageHandler {
     /**
      * Generate export metadata for Option 3
      */
-    private generateExportMetadata(processedImages: ProcessedImage[]): ExportMetadata {
+    private generateExportMetadata(processedImages: ProcessedImage[], images: Array<{ url: string; context: ImageContext }>): ExportMetadata {
         const imageMetadata = processedImages
             .filter(img => img.metadata && img.fileName)
-            .map(img => ({
-                id: img.id,
-                originalUrl: img.metadata!.originalUrl,
-                fileName: img.fileName!,
-                mimeType: img.metadata!.mimeType,
-                size: img.metadata!.fileSize || 0,
-                messageContext: img.metadata!.messageContext || {
-                    messageId: '',
-                    author: 'unknown',
-                    role: 'unknown',
-                },
-            }))
+            .map((img, index) => {
+                const originalContext = images[index]?.context
+                return {
+                    id: img.id,
+                    originalUrl: img.metadata!.originalUrl,
+                    fileName: img.fileName!,
+                    mimeType: img.metadata!.mimeType,
+                    size: img.metadata!.fileSize || 0,
+                    messageContext: {
+                        messageId: originalContext?.messageId || '',
+                        author: img.metadata!.messageContext?.author || 'unknown',
+                        role: img.metadata!.messageContext?.role || 'unknown',
+                        timestamp: img.metadata!.timestamp,
+                    },
+                }
+            })
 
         return {
             version: '1.0.0',

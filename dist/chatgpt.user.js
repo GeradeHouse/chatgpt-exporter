@@ -622,7 +622,7 @@ System.addImportMap({ imports: {"html2canvas":"user:html2canvas","jszip":"user:j
 System.set("user:html2canvas", (()=>{const _=html2canvas;('default' in _)||(_.default=_);return _})());
 System.set("user:jszip", (()=>{const _=JSZip;('default' in _)||(_.default=_);return _})());
 
-System.register("./__entry.js", ['./__monkey.entry-ZrX23HSs.js'], (function (exports, module) {
+System.register("./__entry.js", ['./__monkey.entry-BlCgl1t6.js'], (function (exports, module) {
 	'use strict';
 	return {
 		setters: [null],
@@ -634,7 +634,7 @@ System.register("./__entry.js", ['./__monkey.entry-ZrX23HSs.js'], (function (exp
 	};
 }));
 
-System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (function (exports, module) {
+System.register("./__monkey.entry-BlCgl1t6.js", ['jszip', 'html2canvas'], (function (exports, module) {
   'use strict';
   var JSZip, html2canvas;
   return {
@@ -20832,7 +20832,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
       }
       function base64ToBlob(base64, mimeType) {
         const byteCharacters = atob(base64.split(",")[1]);
-        const byteNumbers = Array.from({ length: byteCharacters.length });
+        const byteNumbers = new Array(byteCharacters.length);
         for (let i2 = 0; i2 < byteCharacters.length; i2++) {
           byteNumbers[i2] = byteCharacters.charCodeAt(i2);
         }
@@ -20867,7 +20867,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
             }
           };
         }
-        generateContent(processedImages, originalContent, _format) {
+        generateContent(processedImages, originalContent, format) {
           return originalContent;
         }
       }
@@ -20905,7 +20905,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
             };
           }
         }
-        generateContent(processedImages, originalContent, _format) {
+        generateContent(processedImages, originalContent, format) {
           return originalContent;
         }
       }
@@ -20935,7 +20935,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
           const customMarker = ScriptStorage.get(KEY_IMAGE_CUSTOM_MARKER) || "[Image Omitted]";
           return customMarker;
         }
-        generateContent(processedImages, originalContent, _format) {
+        generateContent(processedImages, originalContent, format) {
           return originalContent;
         }
       }
@@ -20981,7 +20981,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
             };
           }
         }
-        generateContent(processedImages, originalContent, _format) {
+        generateContent(processedImages, originalContent, format) {
           return originalContent;
         }
       }
@@ -21049,7 +21049,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
          * Generate content string from processed images
          * This is a placeholder - actual content generation happens in export functions
          */
-        async generateContentFromImages(processedImages, _format) {
+        async generateContentFromImages(processedImages, format) {
           const content2 = "[CONTENT_PLACEHOLDER]";
           const files = [];
           if (this.currentStrategy === "separate_files") {
@@ -21203,7 +21203,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
         const { html: html2, exportFiles, imageMetadata } = await conversationToHtml(conversation, userAvatar, metaList);
         if (imageHandlingStrategy === "separate_files" && exportFiles && exportFiles.length > 0) {
           const { createExportZip } = await __vitePreload(async () => {
-            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
+            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
             return { createExportZip: createExportZip2 };
           }, void 0 );
           const metadata = imageMetadata;
@@ -21224,7 +21224,7 @@ System.register("./__monkey.entry-ZrX23HSs.js", ['jszip', 'html2canvas'], (funct
             "text/html"
           );
           const { generateZipFileName } = await __vitePreload(async () => {
-            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
+            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
             return { generateZipFileName: generateZipFileName2 };
           }, void 0 );
           const zipFileName = generateZipFileName(conversation.title, imageHandlingStrategy);
@@ -21856,7 +21856,7 @@ ${content2.text}
         const { markdown, exportFiles, imageMetadata } = await conversationToMarkdown(conversation, metaList);
         if (imageHandlingStrategy === "separate_files" && exportFiles && exportFiles.length > 0) {
           const { createExportZip } = await __vitePreload(async () => {
-            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
+            const { createExportZip: createExportZip2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
             return { createExportZip: createExportZip2 };
           }, void 0 );
           const metadata = imageMetadata;
@@ -21877,7 +21877,7 @@ ${content2.text}
             "text/markdown"
           );
           const { generateZipFileName } = await __vitePreload(async () => {
-            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-skkIlKmj-nCZZjrcW.js');
+            const { generateZipFileName: generateZipFileName2 } = await module.import('./zip-packager-DbpWUpir-BoUwajsC.js');
             return { generateZipFileName: generateZipFileName2 };
           }, void 0 );
           const zipFileName = generateZipFileName(conversation.title, imageHandlingStrategy);
@@ -24307,7 +24307,7 @@ ${content2}`;
   };
 }));
 
-System.register("./zip-packager-skkIlKmj-nCZZjrcW.js", ['jszip', './__monkey.entry-ZrX23HSs.js', 'html2canvas'], (function (exports, module) {
+System.register("./zip-packager-DbpWUpir-BoUwajsC.js", ['jszip', './__monkey.entry-BlCgl1t6.js', 'html2canvas'], (function (exports, module) {
   'use strict';
   var JSZip, sanitizeFileName;
   return {
@@ -24335,14 +24335,14 @@ System.register("./zip-packager-skkIlKmj-nCZZjrcW.js", ['jszip', './__monkey.ent
         /**
          * Add main content file to ZIP
          */
-        addContentFile(fileName, content, _mimeType = "text/plain") {
+        addContentFile(fileName, content, mimeType = "text/plain") {
           this.zip.file(fileName, content);
           return this;
         }
         /**
          * Add image file to ZIP
          */
-        addImageFile(relativePath, data, _mimeType) {
+        addImageFile(relativePath, data, mimeType) {
           this.zip.file(relativePath, data);
           return this;
         }
@@ -24509,7 +24509,7 @@ System.register("./zip-packager-skkIlKmj-nCZZjrcW.js", ['jszip', './__monkey.ent
           return totalSize;
         }
       } exports("ZipPackager", ZipPackager);
-      async function createExportZip(mainFileName, mainContent, imageFiles = [], metadata, _mimeType = "text/plain") {
+      async function createExportZip(mainFileName, mainContent, imageFiles = [], metadata, mimeType = "text/plain") {
         const packager = new ZipPackager();
         packager.addContentFile(mainFileName, mainContent, mimeType);
         if (imageFiles.length > 0) {
@@ -24524,9 +24524,9 @@ System.register("./zip-packager-skkIlKmj-nCZZjrcW.js", ['jszip', './__monkey.ent
         const timeStr = date.toTimeString().split(" ")[0].replace(/:/g, "");
         const sanitizedTitle = sanitizeFileName(conversationTitle).substring(0, 50);
         const strategyPrefix = {
-          embed_base64: "embedded",
-          text_marker: "markers",
-          separate_files: "separate"
+          "embed_base64": "embedded",
+          "text_marker": "markers",
+          "separate_files": "separate"
         }[strategy] || strategy;
         return `chatgpt-export-${strategyPrefix}-${sanitizedTitle}-${dateStr}-${timeStr}.zip`;
       }
